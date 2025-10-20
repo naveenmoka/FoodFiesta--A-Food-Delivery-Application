@@ -15,12 +15,12 @@ test("Should load Button inside  contact us Component", () => {
 });
 test("Should load input placeholder  inside  contact us Component", () => {
   render(<Contact />);
-  const button = screen.getByPlaceholderText("name");
+  const button = screen.getByPlaceholderText("John Doe");
   expect(button).toBeInTheDocument();
 });
 test("should load 2 input boxes on the contact Component", () => {
   render(<Contact />);
   const inputBoxes = screen.getAllByRole("textbox");
   console.log(inputBoxes.length);
-  expect(inputBoxes.length).toBe(2);
+  expect(inputBoxes.length).toBe(3);
 });

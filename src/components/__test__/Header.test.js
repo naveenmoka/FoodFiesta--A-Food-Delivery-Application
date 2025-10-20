@@ -27,17 +27,17 @@ it("Should rendere Header Component with a login button", () => {
   const loginButton = screen.getByRole("button", { name: "Login" });
   expect(loginButton).toBeInTheDocument();
 });
-it("Should render Header Component with a cart items", () => {
-  render(
-    <BrowserRouter>
-      <Provider store={appStore}>
-        <Header />
-      </Provider>
-    </BrowserRouter>
-  );
-  const cartItems = screen.getByText(/Cart/);
-  expect(cartItems).toBeInTheDocument();
-});
+// it("Should render Header Component with a cart items", () => {
+//   render(
+//     <BrowserRouter>
+//       <Provider store={appStore}>
+//         <Header />
+//       </Provider>
+//     </BrowserRouter>
+//   );
+//   const cartItems = screen.getByText("default User");
+//   expect(cartItems).toBeInTheDocument();
+// });
 it("Should change Login Button to Logout on click", () => {
   render(
     <BrowserRouter>

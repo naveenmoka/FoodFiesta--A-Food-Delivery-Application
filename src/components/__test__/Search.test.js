@@ -52,11 +52,21 @@ test("Should renderthe Body component with search", async () => {
     </BrowserRouter>
   );
 
+  // 1. Find the search input and button
   const searchInput = await screen.findByTestId("searchInput");
+  const searchBtn = screen.getByRole("button", { name: "Search" });
+
+  // 2. Verify the input is on the page
   expect(searchInput).toBeInTheDocument();
+
+  // 3. Type "Pizza" into the input
   fireEvent.change(searchInput, { target: { value: "Pizza" } });
-  const searchBtn = screen.getByText("Search");
+
+  // 4. Click the search button
   fireEvent.click(searchBtn);
-  const topRatedBtn = screen.getByText("Top Rated Restaurents");
-  expect(topRatedBtn).toBeInTheDocument();
+
+  // 5. ASSERT THE RESULT:
+  //    Check that the number of rendered cards matches the filter.
+  const cardsAfterSearch = screen.getAllByTestId("resCard");
+  expect(cardsAfterSearch.length).toBe(1); // <-- This is the new, crucial assertion
 });

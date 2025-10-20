@@ -1,45 +1,80 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { act } from "react";
-import RestaurantMenu from "../RestaurantMenu";
-import MOCK_DATA from "../mockData/mockResMenu.json";
 import { Provider } from "react-redux";
+import { act } from "react";
 import appStore from "../../utils/appStore";
-import Header from "../Header";
-import { BrowserRouter } from "react-router-dom";
-import "@testing-library/jest-dom";
+import { addItem, clearCart } from "../../utils/cartSlice";
 import Cart from "../Cart";
+import "@testing-library/jest-dom";
 
-globalThis.fetch = jest.fn(() =>
-  Promise.resolve({
-    json: () => Promise.resolve(MOCK_DATA),
-  })
-);
+// Mock ItemList component's dependencies if it has any, otherwise, just import it
+// For this test, we assume ItemList renders items with data-testid="foodItems"
+import ItemList from "../ItemList";
 
-test("Should render the Restaurant Menu Component", async () => {
-  await act(async () =>
-    render(
-      <BrowserRouter>
-        <Provider store={appStore}>
-          <RestaurantMenu />
-          <Header />
-          <Cart />
-        </Provider>
-      </BrowserRouter>
-    )
+// --- MOCK DATA FOR THE TEST ---
+const MOCK_ITEM = {
+  card: {
+    info: {
+      id: "1001",
+      name: "Test Item",
+      price: 10000,
+    },
+  },
+};
+
+afterEach(() => {
+  act(() => {
+    appStore.dispatch(clearCart());
+  });
+});
+
+// --- TEST CASE 1: EMPTY CART ---
+test("should render Cart component with an empty message", () => {
+  render(
+    <Provider store={appStore}>
+      <Cart />
+    </Provider>
   );
-  const accordianHeader = screen.getByText("Veg Pizza (16)");
-  fireEvent.click(accordianHeader);
-  expect(screen.getAllByTestId("foodItems").length).toBe(16);
 
-  const addBtns = screen.getAllByRole("button", { name: "Add +" });
-  fireEvent.click(addBtns[0]);
-  expect(screen.getByText("Cart (1)")).toBeInTheDocument();
-  fireEvent.click(addBtns[1]);
-  expect(screen.getByText("Cart (2)")).toBeInTheDocument();
-  //expect(screen.getAllByTestId("foodItems").length).toBe(18);
-  fireEvent.click(screen.getByRole("button", { name: "Clear Cart" }));
-  expect(screen.getAllByTestId("foodItems").length).toBe(16);
-  expect(
-    screen.getByText("Cart is empty. Add some items to th cart")
-  ).toBeInTheDocument();
+  const heading = screen.getByText("Cart");
+  expect(heading).toBeInTheDocument();
+
+  const emptyMessage = screen.getByText(
+    "Cart is empty. Add some items to th cart"
+  );
+  expect(emptyMessage).toBeInTheDocument();
+});
+
+// --- TEST CASE 2: CART WITH ITEMS & CLEAR ---
+test("should render Cart with items and clear the cart on button click", () => {
+  act(() => {
+    appStore.dispatch(addItem(MOCK_ITEM));
+  });
+
+  render(
+    <Provider store={appStore}>
+      <Cart />
+    </Provider>
+  );
+
+  // (Assuming your ItemList renders items with data-testid="foodItems")
+  const foodItems = screen.getAllByTestId("foodItems");
+  expect(foodItems.length).toBe(1);
+
+  // Assert that the empty cart message is NOT present
+  const emptyMessage = screen.queryByText(
+    "Cart is empty. Add some items to th cart"
+  );
+  expect(emptyMessage).not.toBeInTheDocument();
+
+  const clearButton = screen.getByRole("button", { name: "Clear Cart" });
+  fireEvent.click(clearButton);
+
+  // ASSERT: Check that the cart is now empty
+  const emptyMessageAfterClear = screen.getByText(
+    "Cart is empty. Add some items to th cart"
+  );
+  expect(emptyMessageAfterClear).toBeInTheDocument();
+
+  const foodItemsAfterClear = screen.queryAllByTestId("foodItems");
+  expect(foodItemsAfterClear.length).toBe(0);
 });
