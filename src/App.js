@@ -1,5 +1,7 @@
 import React, { lazy, Suspense, useEffect, useState } from "react";
 import ReactDOM from "react-dom/client";
+import { Provider } from "react-redux";
+import appStore from "./utils/appStore";
 import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
 import Header from "./components/Header";
 import Body from "./components/Body";
@@ -8,12 +10,9 @@ import Contact from "./components/Contact";
 import Error from "./components/Error";
 import RestaurantMenu from "./components/RestaurantMenu";
 import userContext from "./utils/userContext";
-const root = ReactDOM.createRoot(document.getElementById("root"));
-const Contact = lazy(() => import("./components/Contact"));
-import { Provider } from "react-redux";
-import appStore from "./utils/appStore";
 import Cart from "./components/Cart";
 import Footer from "./components/Footer";
+const Contact = lazy(() => import("./components/Contact"));
 
 const AppLayout = () => {
   const [userName, setUserName] = useState();
@@ -71,4 +70,6 @@ const appRouter = createBrowserRouter([
     errorElement: <Error />,
   },
 ]);
+const root = ReactDOM.createRoot(document.getElementById("root"));
+
 root.render(<RouterProvider router={appRouter} />);
